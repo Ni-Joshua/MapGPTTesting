@@ -57,5 +57,5 @@ folders = {
 filelist = pd.read_csv('Map2Loc_Full_Test_Data/FileList.csv')["File"].values
 
 # convert_directory_tiff_to_png('Img2Loc_Test_Data/Images', "Img2Loc_Test_Data/PNGs")
-convert_directory_tiff_to_jpg('Img2Loc_Test_Data/Images', "Img2Loc_Test_Data/JPEGs", 90)
+# convert_directory_tiff_to_jpg('Img2Loc_Test_Data/Images', "Img2Loc_Test_Data/JPEGs", 90)
 # convert_fileList_tiff_to_jpg(filelist, "Map2Loc_Full_Test_Data/testing_data_jpeg",90)

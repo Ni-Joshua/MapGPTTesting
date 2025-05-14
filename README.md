@@ -1,8 +1,6 @@
 ﻿# MapGPTTesting
 File Run order:
 
-tifConversion.py
-
 GPTtests.py
 
 eval.py

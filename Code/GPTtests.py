@@ -5,6 +5,8 @@ import numpy
 from openai import OpenAI, AzureOpenAI
 import base64
 from pydantic import BaseModel
+from PIL import Image
+import io
 
 #change api key to Azure one
 # gpt = OpenAI(api_key=os.environ.get("GPT_API_KEY"))
@@ -19,6 +21,8 @@ gpt = AzureOpenAI(
 
 infoFolder = "Map2Loc_Full_Test_Data/testing_data_json"
 imgFolder = "Map2Loc_Full_Test_Data/testing_data_jpeg"
+tifimgFolder = 'Img2Loc_Test_Data/Images'
+
 dfCols = ["imgPath", "Prompt", "Response","Ground Truth"]
 model = "4o"
 #add return format to prompts
@@ -31,6 +35,26 @@ prompts = [
 "Your sole task is to look at the provided historical map image and determine its geographic bounding box. You should mainly utilize geographic features found in the map. You must output **only** four decimal-degree numbers in this exact order and format, with no extra text: (leftmost_longitude, rightmost_longitude, top_latitude, bottom_latitude). Include parentheses, commas, and spaces.  These numbers should not include text and the ° symbol.",
 ]
 
+def convert_tiff_to_jpg(tiff_filepath, quality):
+    try:
+        img = Image.open(tiff_filepath)
+        buffer = io.BytesIO()
+        
+        rgb_img = img.convert('RGB')        
+        rgb_img.save(buffer, 'JPEG', quality=quality, optimize=True)
+
+        jpgbytes =  buffer.getvalue()
+        # jpg =Image.open(buffer)
+        buffer.close()
+        file_size_bytes = len(jpgbytes)
+        file_size_kb = file_size_bytes / 1024
+        file_size_mb = file_size_kb / 1024
+        if (file_size_mb >= 20):
+            convert_tiff_to_jpg(tiff_filepath, quality-5)
+        else:
+            return jpgbytes
+    except Exception as e:
+        print(f"Error converting {tiff_filepath}: {e}")
 
 def loadFiles(infoFolder, imgFolder, df):
     index = 0
@@ -57,6 +81,7 @@ def constructPrompt(infoFile):
     return prompt
 
 def callGPT(currentImage, prompt):
+    currentImage = convert_tiff_to_jpg(currentImage, 90)
     for i in range(0,7):
         try:
             response = gpt.chat.completions.create(
@@ -80,9 +105,10 @@ def callGPT(currentImage, prompt):
             continue
     return "Error: Could not Generate a Response"
 
-def encodeImage(filePath):
-    with open(filePath, "rb") as image_file:
-        image_data = base64.b64encode(image_file.read()).decode('utf-8')
+def encodeImage(bytes):
+    # with open(filePath, "rb") as image_file:
+    #     image_data = base64.b64encode(image_file.read()).decode('utf-8')
+    image_data = base64.b64encode(bytes).decode('utf-8')
     return image_data
 
 for promptid in range(4,6):
