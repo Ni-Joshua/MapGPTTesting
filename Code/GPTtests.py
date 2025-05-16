@@ -73,7 +73,7 @@ def loadFiles(infoFolder, imgFolder, df):
         index+=1
         if(index%10 == 0):
             df2 = pd.DataFrame(df, columns=dfCols)
-            df2.to_csv(f"Map2Loc_GPTResults/{model}TestResults{promptid}_{index}.csv", index = False)
+            df2.to_csv(f"Map2Loc_GPTResults/{model}TestResults{promptid}.csv", index = False)
         
 
 def constructPrompt(infoFile):
@@ -115,7 +115,7 @@ for promptid in range(4,6):
     df = []
     loadFiles(infoFolder, imgFolder, df)
     df = pd.DataFrame(df, columns=dfCols)
-    df.to_csv(f"Map2Loc_GPTResults/{model}TestResults{promptid}_Completed.csv", index = False)
+    df.to_csv(f"Map2Loc_GPTResults/{model}TestResults{promptid}.csv", index = False)
 
 #IOU or DICE for evaluation, 
 
